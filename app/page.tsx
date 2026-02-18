@@ -57,7 +57,7 @@ Thành tích     : ${stars} Ngôi sao
 
   useEffect(()=>{
     if (typeof window !== "undefined") {
-      const esp32_ip = "192.168.1.134"; // Kiểm tra xem IP này có thay đổi không
+      const esp32_ip = "192.168.1.14"; 
       const socket = new WebSocket(`ws://${esp32_ip}/ws`);
 
       socket.onopen = () => console.log("Connected to ESP32");
