@@ -56,27 +56,30 @@ Thành tích     : ${stars} Ngôi sao
   };
 
   useEffect(()=>{
-    let socket: WebSocket;
-    const esp32_ip = "192.168.1.134";
-    const connect = () => {
-      socket = new WebSocket(`ws://${esp32_ip}/ws`);
-      socket.onopen = () => console.log("Hệ thống đã sẵn sàng!");
-      socket.onmessage = (event) => {
-      const data = JSON.parse(event.data);
-      setHeartRate(data.hr);
-      setCalories(data.cal);
-      setIntensity(data.intensity);
-      setTotalSeconds(Number(data.time));
-      setConnected(Number(data.connected));
-    };
-      socket.onclose = () => {
-      console.log("Mất kết nối với ESP32, đang thử lại...");
-      setTimeout(connect, 3000); 
-    };
-  };
+    if (typeof window !== "undefined") {
+      const esp32_ip = "192.168.1.134"; // Kiểm tra xem IP này có thay đổi không
+      const socket = new WebSocket(`ws://${esp32_ip}/ws`);
 
-  connect();
-  return () => socket?.close();
+      socket.onopen = () => console.log("Connected to ESP32");
+      
+      socket.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          setHeartRate(data.hr);
+          setCalories(data.cal);
+          setIntensity(data.intensity);
+          setTotalSeconds(data.time);
+          setConnected(Number(data.connected));
+        } catch (err) {
+          console.error("Lỗi đọc dữ liệu JSON:", err);
+        }
+      };
+    socket.onerror = (error) => {
+        console.error("Lỗi WebSocket:", error);
+      };
+
+      return () => socket.close();
+    }
 }, []);
   useEffect(() => {
       const timer = setInterval(() => {
