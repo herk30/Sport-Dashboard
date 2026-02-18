@@ -150,7 +150,7 @@ Thành tích     : ${stars} Ngôi sao
           </p>
           <div className="mb-7 flex-1 flex items-center justify-center w-full">
             <p className={`font-black leading-none transition-all duration-300 text-white ${getFontSize(calories)}`}>
-              {calories !== undefined ? calories.toFixed(0) : "0"} 
+              {(Number(calories) || 0).toFixed(0)}
             </p>
           </div>
           <p className="text-white mb-20 text-4xl font-bold tracking-widest">
@@ -164,7 +164,7 @@ Thành tích     : ${stars} Ngôi sao
           </p>
           <div className="mb-7 flex-1 flex items-center justify-center w-full">
             <p className={`font-black leading-none transition-all duration-300 text-white ${getFontSize(intensity)}`}>
-              {intensity !== undefined ? intensity.toFixed(0) : "0"}
+              {(Number(intensity) || 0).toFixed(0)}
             </p>
           </div>
           <p className="text-white mb-20 text-4xl font-bold tracking-widest">
@@ -178,7 +178,7 @@ Thành tích     : ${stars} Ngôi sao
           </p>
           <div className="mb-7 flex-1 flex items-center justify-center w-full">
             <p className={`font-black leading-none transition-all duration-300 text-white ${getFontSize(heartRate)}`}>
-              {heartRate !== undefined ? heartRate.toFixed(0) : "0"}
+              {(Number(heartRate) || 0).toFixed(0)}
             </p>
           </div>
           <p className="text-white mb-20 text-4xl font-bold tracking-widest">
