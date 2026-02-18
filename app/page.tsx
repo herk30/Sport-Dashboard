@@ -108,12 +108,12 @@ Thành tích     : ${stars} Ngôi sao
             LE KHOI
           </p>
           <div className="flex items-center gap-1 mt-2">
-            {[...Array(Math.floor(calories / 70))].map((_, index) => (
-              <FaStar 
-                key={index} 
-                className="text-3xl drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" 
-              />
-            ))}
+{[...Array(Math.max(0, Math.floor(calories / 70) || 0))].map((_, index) => (
+  <FaStar 
+    key={index} 
+    className="text-3xl drop-shadow-[0_0_10px_rgba(250,204,21,0.8)]" 
+  />
+))}
           </div>
         </div>
         <div className="absolute left-1/2 -translate-x-1/2">
