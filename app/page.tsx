@@ -54,33 +54,66 @@ Thành tích     : ${stars} Ngôi sao
     const secs = seconds % 60;
     return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
-
-  useEffect(()=>{
+useEffect(() => {
     if (typeof window !== "undefined") {
-      const esp32_ip = "192.168.1.14"; 
-      const socket = new WebSocket(`ws://${esp32_ip}/ws`);
+      const esp32_ips = ["192.168.1.14", "192.168.1.15", "192.168.1.100"]; 
+      let socket: WebSocket | null = null;
+      let isConnected = false;
 
-      socket.onopen = () => console.log("Connected to ESP32");
-      
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          setHeartRate(data.hr);
-          setCalories(data.cal);
-          setIntensity(data.intensity);
-          setTotalSeconds(data.time);
-          setConnected(Number(data.connected));
-        } catch (err) {
-          console.error("Lỗi đọc dữ liệu JSON:", err);
+      const connectToESP32 = (ipIndex: number) => {
+        if (ipIndex >= esp32_ips.length) {
+          console.error("Đã thử hết tất cả IP nhưng không thể kết nối tới ESP32.");
+          setConnected(0);
+          return;
+        }
+
+        const currentIp = esp32_ips[ipIndex];
+        console.log(`Đang thử kết nối WebSocket với: ${currentIp}...`);
+        
+        socket = new WebSocket(`ws://${currentIp}/ws`);
+
+        socket.onopen = () => {
+          console.log(`✅ Kết nối thành công với ESP32 tại IP: ${currentIp}`);
+          isConnected = true;
+        };
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            setHeartRate(data.hr);
+            setCalories(data.cal);
+            setIntensity(data.intensity);
+            setTotalSeconds(data.time);
+            setConnected(Number(data.connected));
+          } catch (err) {
+            console.error("Lỗi đọc dữ liệu JSON:", err);
+          }
+        };
+
+        socket.onerror = (error) => {
+          console.error(`❌ Lỗi kết nối tại ${currentIp}`);
+        };
+
+        socket.onclose = () => {
+          if (!isConnected) {
+            console.log(`Kết nối thất bại với ${currentIp}, chuyển sang IP tiếp theo...`);
+            connectToESP32(ipIndex + 1);
+          } else {
+            console.log("Bị mất kết nối với ESP32 đang chạy.");
+            isConnected = false;
+            setConnected(0);
+          }
+        };
+      };
+
+      connectToESP32(0);
+      return () => {
+        if (socket) {
+          socket.close();
         }
       };
-    socket.onerror = (error) => {
-        console.error("Lỗi WebSocket:", error);
-      };
-
-      return () => socket.close();
     }
-}, []);
+  }, []);
   useEffect(() => {
       const timer = setInterval(() => {
         if (connectedRef.current === 1) {
